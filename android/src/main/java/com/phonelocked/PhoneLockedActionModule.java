@@ -1,24 +1,26 @@
-package com.reactlibrary;
+package com.phonelocked;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.widget.Toast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
+
 import androidx.annotation.Nullable;
 
 public class PhoneLockedActionModule extends ReactContextBaseJavaModule {
+
+    AudioManager manager;
 
     private final ReactApplicationContext reactContext;
 
@@ -33,6 +35,7 @@ public class PhoneLockedActionModule extends ReactContextBaseJavaModule {
     public PhoneLockedActionModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        manager = (AudioManager) reactContext.getSystemService(Context.AUDIO_SERVICE);
         registerBroadcastReceiver();
     }
 
@@ -49,8 +52,10 @@ public class PhoneLockedActionModule extends ReactContextBaseJavaModule {
             if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)){
                 action="ACTION_USER_PRESENT";
             }else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+                manager.setStreamMute(AudioManager.STREAM_MUSIC, true);
                 action="ACTION_SCREEN_OFF";
             }else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)){
+                manager.setStreamMute(AudioManager.STREAM_MUSIC, false);
                 action="ACTION_SCREEN_ON";
             }
             params.putString("action", action);
